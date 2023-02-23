@@ -24,9 +24,7 @@
 Plugin:
 
 ```shell
-asdf plugin add ansible
-# or
-asdf plugin add https://github.com/Bleacks/asdf-ansible.git
+asdf plugin add ansible https://github.com/pythoninthegrass/asdf-ansible-plugin.git
 ```
 
 ansible:
