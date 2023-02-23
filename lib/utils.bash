@@ -86,7 +86,7 @@ install_version() {
     # tar -xzf "$release_file" -C "$install_path" --strip-components=1 || fail "Could not extract $release_file"
     # rm "$release_file"
 	script_path
-    pip install ansible=="$version"
+    python -m pip install ansible=="$version"
 
     local tool_cmd
     tool_cmd="$(echo "ansible --version" | cut -d' ' -f1)"
