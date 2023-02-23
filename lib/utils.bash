@@ -8,6 +8,7 @@ script_path() {
 	# verify bins are installed
 	declare -a bins_arr=(
 		asdf
+		python
 		pip
 		jq
 		curl
@@ -25,11 +26,24 @@ script_path() {
 		fi
 	done
 
+	paths=($(echo "${paths[@]}" | tr ' ' '\n' | sort | uniq))
+
+	# trash ansible path
+	# ans_bin="/var/folders/ld/6_7_h31s52xcgyz51wwy6fk00000gp/T/asdf.XXXX.K1xDQx9a/"	# QA
+
 	# replace whitespace with ":" and add to PATH
 	export PATH=/usr/bin:/bin:/usr/sbin:/sbin
-	export PATH=$(echo "${paths[@]}" | tr ' ' ':'):$PATH
+	# export PATH="${ans_bin}":$(echo "${paths[@]}" | tr ' ' ':'):$PATH	# QA
+	export PATH=$(echo "${paths[@]}" | tr ' ' ':'):$PATH				# prod
+
+	# remove "/var/folders/ld/*/*/asdf.*.*/" from path
+	export PATH=$(echo "$PATH" | sed -e 's/\/var\/folders\/ld\/.*\/T\/asdf\.XXXX\..*\/://g')
+
 	# echo "$PATH"
 }
+# script_path
+
+# exit 0
 
 GH_REPO="https://github.com/ansible/ansible"
 # GH_API_REPO="https://api.github.com/repos/ansible/ansible"
@@ -86,6 +100,7 @@ install_version() {
     # tar -xzf "$release_file" -C "$install_path" --strip-components=1 || fail "Could not extract $release_file"
     # rm "$release_file"
 	script_path
+	asdf reshim python
     python -m pip install ansible=="$version"
 
     local tool_cmd
