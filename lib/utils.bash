@@ -1,8 +1,35 @@
 #!/usr/bin/env bash
 
-# shellcheck disable=SC2034,SC2046
+# shellcheck disable=SC2155,SC2034,SC2207,SC2317,SC2046
 
 set -xeuo pipefail
+
+script_path() {
+	# verify bins are installed
+	declare -a bins_arr=(
+		asdf
+		pip
+		jq
+		curl
+	)
+
+	# TODO: golf to one liner conditional in inner loop
+	# add bins to script path
+	paths=()
+	for i in "${bins_arr[@]}"; do
+		if [[ $(command -v "$i" >/dev/null 2>&1; echo "$?") -eq 0 ]]; then
+			paths+=($(dirname $(which "$i")))
+		else
+			echo "Please install/reshim. Missing $i"
+			exit 1
+		fi
+	done
+
+	# replace whitespace with ":" and add to PATH
+	export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+	export PATH=$(echo "${paths[@]}" | tr ' ' ':'):$PATH
+	# echo "$PATH"
+}
 
 GH_REPO="https://github.com/ansible/ansible"
 # GH_API_REPO="https://api.github.com/repos/ansible/ansible"
@@ -58,6 +85,7 @@ install_version() {
     # download_release "$version" "$release_file"
     # tar -xzf "$release_file" -C "$install_path" --strip-components=1 || fail "Could not extract $release_file"
     # rm "$release_file"
+	script_path
     pip install ansible=="$version"
 
     local tool_cmd
